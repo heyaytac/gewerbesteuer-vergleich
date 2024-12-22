@@ -39,7 +39,7 @@ const TaxCalculator = () => {
   };
 
   return (
-    <div className="mt-12 max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
+    <div className="mt-12 max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-lg w-full">
       <h2 className="text-xl font-semibold mb-4">Gewerbesteuer-Rechner</h2>
       <div className="space-y-4">
         <div>
