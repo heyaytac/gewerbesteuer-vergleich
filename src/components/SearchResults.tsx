@@ -2,9 +2,10 @@ import { CityData } from "@/types/city";
 
 interface SearchResultsProps {
   results: CityData[];
+  onCitySelect: (city: CityData) => void;
 }
 
-const SearchResults = ({ results }: SearchResultsProps) => {
+const SearchResults = ({ results, onCitySelect }: SearchResultsProps) => {
   if (results.length === 0) return null;
 
   return (
@@ -12,7 +13,8 @@ const SearchResults = ({ results }: SearchResultsProps) => {
       {results.map((city) => (
         <div
           key={city.id}
-          className="p-4 border-b last:border-b-0 hover:bg-gray-50 transition-colors"
+          className="p-4 border-b last:border-b-0 hover:bg-gray-50 transition-colors cursor-pointer"
+          onClick={() => onCitySelect(city)}
         >
           <div className="flex justify-between items-center">
             <div>

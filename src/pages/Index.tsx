@@ -4,10 +4,12 @@ import { Input } from "@/components/ui/input";
 import SearchResults from "@/components/SearchResults";
 import { CityData } from "@/types/city";
 import { cities } from "@/data/cities";
+import ComparisonTable from "@/components/ComparisonTable";
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState<CityData[]>([]);
+  const [selectedCities, setSelectedCities] = useState<CityData[]>([]);
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
@@ -21,8 +23,20 @@ const Index = () => {
     }
   };
 
+  const handleCitySelect = (city: CityData) => {
+    if (!selectedCities.find(c => c.id === city.id) && selectedCities.length < 3) {
+      setSelectedCities([...selectedCities, city]);
+      setSearchTerm("");
+      setResults([]);
+    }
+  };
+
+  const handleRemoveCity = (cityId: number) => {
+    setSelectedCities(selectedCities.filter(city => city.id !== cityId));
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 font-inter">
       <div className="container mx-auto px-4 py-12">
         <header className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 text-gray-900">
@@ -45,7 +59,11 @@ const Index = () => {
             />
           </div>
 
-          <SearchResults results={results} />
+          <SearchResults results={results} onCitySelect={handleCitySelect} />
+          
+          {selectedCities.length > 0 && (
+            <ComparisonTable cities={selectedCities} onRemoveCity={handleRemoveCity} />
+          )}
         </div>
 
         <section className="mt-24 text-center">
