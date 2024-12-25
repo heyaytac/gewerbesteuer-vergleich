@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { CityData } from '@/types/city';
 
-const supabaseUrl = 'https://lovable.supabase.co';
+const supabaseUrl = 'https://vjsfjxkzybqxppnerhbr.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqc2ZqeGt6eWJxeHBwbmVyaGJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDc0ODg5NzAsImV4cCI6MjAyMzA2NDk3MH0.Ij9XWI5QHPz5Yw5FkEJwxcVEVHQWBFVU-wRhGYK_Zzg';
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
