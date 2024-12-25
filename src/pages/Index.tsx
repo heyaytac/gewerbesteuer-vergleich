@@ -3,33 +3,26 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import SearchResults from "@/components/SearchResults";
 import { CityData } from "@/types/city";
-import { cities } from "@/data/cities";
 import ComparisonTable from "@/components/ComparisonTable";
 import TaxCalculator from "@/components/TaxCalculator";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { searchCities } from "@/lib/supabase";
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [results, setResults] = useState<CityData[]>([]);
   const [selectedCities, setSelectedCities] = useState<CityData[]>([]);
 
-  const handleSearch = (term: string) => {
-    setSearchTerm(term);
-    if (term.length > 2) {
-      const filtered = cities.filter((city) =>
-        city.name.toLowerCase().includes(term.toLowerCase())
-      );
-      setResults(filtered);
-    } else {
-      setResults([]);
-    }
-  };
+  const { data: results = [], isLoading } = useQuery({
+    queryKey: ['cities', searchTerm],
+    queryFn: () => searchCities(searchTerm),
+    enabled: searchTerm.length > 2,
+  });
 
   const handleCitySelect = (city: CityData) => {
     if (!selectedCities.find(c => c.id === city.id) && selectedCities.length < 3) {
       setSelectedCities([...selectedCities, city]);
       setSearchTerm("");
-      setResults([]);
     }
   };
 
@@ -57,11 +50,15 @@ const Index = () => {
               placeholder="Stadt eingeben..."
               className="pl-10 h-12 text-lg"
               value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
-          <SearchResults results={results} onCitySelect={handleCitySelect} />
+          {isLoading ? (
+            <div className="mt-4 text-center text-gray-600">Lade Städte...</div>
+          ) : (
+            <SearchResults results={results} onCitySelect={handleCitySelect} />
+          )}
           
           {selectedCities.length > 0 && (
             <ComparisonTable cities={selectedCities} onRemoveCity={handleRemoveCity} />
@@ -97,22 +94,6 @@ const Index = () => {
         </section>
 
         <footer className="mt-24 border-t pt-12 pb-6">
-          <div className="max-w-6xl mx-auto">
-            <h3 className="text-xl font-semibold mb-6">Alle Städte im Überblick</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {cities.map((city) => (
-                <Link
-                  key={city.id}
-                  to={`/city/${city.name.toLowerCase()}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800 transition-colors"
-                >
-                  {city.name}
-                </Link>
-              ))}
-            </div>
-          </div>
           <div className="text-center mt-12 text-sm text-gray-600">
             © {new Date().getFullYear()} Gewerbesteuer Vergleich
           </div>
