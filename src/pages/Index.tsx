@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import SearchResults from "@/components/SearchResults";
@@ -12,14 +12,30 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LoadingState } from "@/components/LoadingState";
 import { TaxRateChart } from "@/components/TaxRateChart";
+import { SearchFilters, SearchFilters as SearchFiltersType } from "@/components/SearchFilters";
+import { RecentSearches } from "@/components/RecentSearches";
+import { CityStats } from "@/components/CityStats";
+import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCities, setSelectedCities] = useState<CityData[]>([]);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    const saved = localStorage.getItem("recentSearches");
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [filters, setFilters] = useState<SearchFiltersType>({
+    bundesland: "",
+    minPopulation: 0,
+    maxPopulation: 10000000,
+    minHebesatz: 0,
+    maxHebesatz: 1000,
+  });
+
+  const { toast } = useToast();
 
   const { data: results = [], isLoading: isSearchLoading } = useQuery({
-    queryKey: ['cities', searchTerm],
+    queryKey: ['cities', searchTerm, filters],
     queryFn: () => searchCities(searchTerm),
     enabled: searchTerm.length > 2,
   });
@@ -29,19 +45,44 @@ const Index = () => {
     queryFn: fetchCities,
   });
 
+  const filteredResults = results.filter((city) => {
+    return (
+      (!filters.bundesland || city.bundesland.toLowerCase().includes(filters.bundesland.toLowerCase())) &&
+      city.einwohner >= filters.minPopulation &&
+      city.einwohner <= filters.maxPopulation &&
+      city.hebesatz >= filters.minHebesatz &&
+      city.hebesatz <= filters.maxHebesatz
+    );
+  });
+
   const handleCitySelect = (city: CityData) => {
-    if (!selectedCities.find(c => c.id === city.id) && selectedCities.length < 3) {
+    if (!selectedCities.find(c => c.id === city.id)) {
+      if (selectedCities.length >= 3) {
+        toast({
+          title: "Maximale Anzahl erreicht",
+          description: "Sie können maximal 3 Städte vergleichen.",
+          variant: "destructive",
+        });
+        return;
+      }
       setSelectedCities([...selectedCities, city]);
       setSearchTerm("");
+      
       // Add to recent searches
       if (!recentSearches.includes(city.name)) {
-        setRecentSearches([city.name, ...recentSearches.slice(0, 4)]);
+        const newSearches = [city.name, ...recentSearches.slice(0, 4)];
+        setRecentSearches(newSearches);
+        localStorage.setItem("recentSearches", JSON.stringify(newSearches));
       }
     }
   };
 
   const handleRemoveCity = (cityId: number) => {
     setSelectedCities(selectedCities.filter(city => city.id !== cityId));
+  };
+
+  const handleFilterChange = (newFilters: SearchFiltersType) => {
+    setFilters(newFilters);
   };
 
   if (isAllCitiesLoading) {
@@ -62,7 +103,9 @@ const Index = () => {
           </p>
         </header>
 
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl mx-auto space-y-6">
+          <SearchFilters onFilterChange={handleFilterChange} />
+
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -74,30 +117,24 @@ const Index = () => {
             />
           </div>
 
-          {recentSearches.length > 0 && (
-            <div className="mt-2 flex gap-2 flex-wrap">
-              {recentSearches.map((search) => (
-                <button
-                  key={search}
-                  className="text-sm text-muted-foreground hover:text-foreground"
-                  onClick={() => setSearchTerm(search)}
-                >
-                  {search}
-                </button>
-              ))}
-            </div>
-          )}
+          <RecentSearches
+            searches={recentSearches}
+            onSearchSelect={setSearchTerm}
+          />
 
           {isSearchLoading ? (
             <LoadingState />
           ) : (
-            <SearchResults results={results} onCitySelect={handleCitySelect} />
+            <SearchResults results={filteredResults} onCitySelect={handleCitySelect} />
           )}
           
           {selectedCities.length > 0 && (
             <>
               <ComparisonTable cities={selectedCities} onRemoveCity={handleRemoveCity} />
               <TaxRateChart cities={selectedCities} />
+              {selectedCities.map((city) => (
+                <CityStats key={city.id} city={city} />
+              ))}
             </>
           )}
 
@@ -109,21 +146,21 @@ const Index = () => {
             Warum Gewerbesteuer vergleichen?
           </h2>
           <div className="grid md:grid-cols-3 gap-8 text-left max-w-4xl mx-auto">
-            <div className="p-6 bg-white rounded-lg shadow-sm">
+            <div className="p-6 bg-card rounded-lg shadow-sm">
               <h3 className="font-semibold mb-2">Kosten optimieren</h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Durch die Wahl des richtigen Standorts können Sie erhebliche Steuerersparnisse erzielen.
               </p>
             </div>
-            <div className="p-6 bg-white rounded-lg shadow-sm">
+            <div className="p-6 bg-card rounded-lg shadow-sm">
               <h3 className="font-semibold mb-2">Transparent vergleichen</h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Alle Hebesätze und Informationen übersichtlich auf einen Blick.
               </p>
             </div>
-            <div className="p-6 bg-white rounded-lg shadow-sm">
+            <div className="p-6 bg-card rounded-lg shadow-sm">
               <h3 className="font-semibold mb-2">Fundiert entscheiden</h3>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Treffen Sie Ihre Standortentscheidung auf Basis aktueller Daten.
               </p>
             </div>
@@ -137,7 +174,7 @@ const Index = () => {
                 <HoverCardTrigger asChild>
                   <Link
                     to={`/city/${city.name.toLowerCase()}`}
-                    className="text-sm text-gray-600 hover:text-gray-900 cursor-pointer"
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {city.name}
                   </Link>
@@ -145,16 +182,16 @@ const Index = () => {
                 <HoverCardContent className="w-80">
                   <div className="space-y-2">
                     <h4 className="text-lg font-semibold">{city.name}</h4>
-                    <p className="text-sm text-gray-600">Bundesland: {city.bundesland}</p>
-                    <p className="text-sm text-gray-600">Hebesatz: {city.hebesatz}%</p>
-                    <p className="text-sm text-gray-600">Grundsteuer B: {city.grundsteuerB}%</p>
-                    <p className="text-sm text-gray-600">Einwohner: {city.einwohner.toLocaleString()}</p>
+                    <p className="text-sm text-muted-foreground">Bundesland: {city.bundesland}</p>
+                    <p className="text-sm text-muted-foreground">Hebesatz: {city.hebesatz}%</p>
+                    <p className="text-sm text-muted-foreground">Grundsteuer B: {city.grundsteuerB}%</p>
+                    <p className="text-sm text-muted-foreground">Einwohner: {city.einwohner.toLocaleString()}</p>
                   </div>
                 </HoverCardContent>
               </HoverCard>
             ))}
           </div>
-          <div className="text-center text-sm text-gray-600">
+          <div className="text-center text-sm text-muted-foreground">
             © {new Date().getFullYear()} Gewerbesteuer Vergleich
           </div>
         </footer>
