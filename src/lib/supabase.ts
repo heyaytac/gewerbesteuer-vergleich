@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { CityData } from '@/types/city';
 
-const supabaseUrl = 'https://vjsfjxkzybqxppnerhbr.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZqc2ZqeGt6eWJxeHBwbmVyaGJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDc0ODg5NzAsImV4cCI6MjAyMzA2NDk3MH0.Ij9XWI5QHPz5Yw5FkEJwxcVEVHQWBFVU-wRhGYK_Zzg';
+const supabaseUrl = 'https://kxnzmfuyftpkmnlnpfnb.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4bnptZnV5ZnRwa21ubG5wZm5iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUxMjI1NzksImV4cCI6MjA1MDY5ODU3OX0.MZUu9x4CXW2q9eX5e9tMnye8IWkb4uatXEvJ3-Y-QzM';
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
