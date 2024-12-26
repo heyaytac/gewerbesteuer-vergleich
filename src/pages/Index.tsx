@@ -9,18 +9,22 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { searchCities, fetchCities } from "@/lib/supabase";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { LoadingState } from "@/components/LoadingState";
+import { TaxRateChart } from "@/components/TaxRateChart";
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCities, setSelectedCities] = useState<CityData[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
-  const { data: results = [], isLoading } = useQuery({
+  const { data: results = [], isLoading: isSearchLoading } = useQuery({
     queryKey: ['cities', searchTerm],
     queryFn: () => searchCities(searchTerm),
     enabled: searchTerm.length > 2,
   });
 
-  const { data: allCities = [] } = useQuery({
+  const { data: allCities = [], isLoading: isAllCitiesLoading } = useQuery({
     queryKey: ['allCities'],
     queryFn: fetchCities,
   });
@@ -29,6 +33,10 @@ const Index = () => {
     if (!selectedCities.find(c => c.id === city.id) && selectedCities.length < 3) {
       setSelectedCities([...selectedCities, city]);
       setSearchTerm("");
+      // Add to recent searches
+      if (!recentSearches.includes(city.name)) {
+        setRecentSearches([city.name, ...recentSearches.slice(0, 4)]);
+      }
     }
   };
 
@@ -36,21 +44,27 @@ const Index = () => {
     setSelectedCities(selectedCities.filter(city => city.id !== cityId));
   };
 
+  if (isAllCitiesLoading) {
+    return <LoadingState />;
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 font-inter">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/50 font-inter animate-fade-in">
+      <ThemeToggle />
+      
       <div className="container mx-auto px-4 py-12">
-        <header className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 text-gray-900">
+        <header className="text-center mb-12 animate-fade-in">
+          <h1 className="text-4xl font-bold mb-4 text-foreground">
             Gewerbesteuer-Vergleich
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Vergleichen Sie die Gewerbesteuer-Hebesätze deutscher Städte und finden Sie den optimalen Standort für Ihr Unternehmen
           </p>
         </header>
 
         <div className="max-w-2xl mx-auto">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
             <Input
               type="text"
               placeholder="Stadt eingeben..."
@@ -60,21 +74,38 @@ const Index = () => {
             />
           </div>
 
-          {isLoading ? (
-            <div className="mt-4 text-center text-gray-600">Lade Städte...</div>
+          {recentSearches.length > 0 && (
+            <div className="mt-2 flex gap-2 flex-wrap">
+              {recentSearches.map((search) => (
+                <button
+                  key={search}
+                  className="text-sm text-muted-foreground hover:text-foreground"
+                  onClick={() => setSearchTerm(search)}
+                >
+                  {search}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {isSearchLoading ? (
+            <LoadingState />
           ) : (
             <SearchResults results={results} onCitySelect={handleCitySelect} />
           )}
           
           {selectedCities.length > 0 && (
-            <ComparisonTable cities={selectedCities} onRemoveCity={handleRemoveCity} />
+            <>
+              <ComparisonTable cities={selectedCities} onRemoveCity={handleRemoveCity} />
+              <TaxRateChart cities={selectedCities} />
+            </>
           )}
 
           <TaxCalculator />
         </div>
 
-        <section className="mt-24 text-center">
-          <h2 className="text-2xl font-semibold mb-6 text-gray-900">
+        <section className="mt-24 text-center animate-fade-in">
+          <h2 className="text-2xl font-semibold mb-6 text-foreground">
             Warum Gewerbesteuer vergleichen?
           </h2>
           <div className="grid md:grid-cols-3 gap-8 text-left max-w-4xl mx-auto">
