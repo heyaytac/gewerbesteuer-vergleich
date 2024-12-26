@@ -7,7 +7,8 @@ import ComparisonTable from "@/components/ComparisonTable";
 import TaxCalculator from "@/components/TaxCalculator";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { searchCities } from "@/lib/supabase";
+import { searchCities, fetchCities } from "@/lib/supabase";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -17,6 +18,11 @@ const Index = () => {
     queryKey: ['cities', searchTerm],
     queryFn: () => searchCities(searchTerm),
     enabled: searchTerm.length > 2,
+  });
+
+  const { data: allCities = [] } = useQuery({
+    queryKey: ['allCities'],
+    queryFn: fetchCities,
   });
 
   const handleCitySelect = (city: CityData) => {
@@ -94,7 +100,30 @@ const Index = () => {
         </section>
 
         <footer className="mt-24 border-t pt-12 pb-6">
-          <div className="text-center mt-12 text-sm text-gray-600">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-12">
+            {allCities.map((city) => (
+              <HoverCard key={city.id}>
+                <HoverCardTrigger asChild>
+                  <Link
+                    to={`/city/${city.name.toLowerCase()}`}
+                    className="text-sm text-gray-600 hover:text-gray-900 cursor-pointer"
+                  >
+                    {city.name}
+                  </Link>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80">
+                  <div className="space-y-2">
+                    <h4 className="text-lg font-semibold">{city.name}</h4>
+                    <p className="text-sm text-gray-600">Bundesland: {city.bundesland}</p>
+                    <p className="text-sm text-gray-600">Hebesatz: {city.hebesatz}%</p>
+                    <p className="text-sm text-gray-600">Grundsteuer B: {city.grundsteuerB}%</p>
+                    <p className="text-sm text-gray-600">Einwohner: {city.einwohner.toLocaleString()}</p>
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+            ))}
+          </div>
+          <div className="text-center text-sm text-gray-600">
             © {new Date().getFullYear()} Gewerbesteuer Vergleich
           </div>
         </footer>
