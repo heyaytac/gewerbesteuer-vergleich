@@ -1,11 +1,37 @@
 import { useParams, Link } from "react-router-dom";
-import { cities } from "@/data/cities";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
+import { CityStats } from "@/components/CityStats";
+import { LoadingState } from "@/components/LoadingState";
 
 const CityDetails = () => {
   const { cityName } = useParams();
-  const city = cities.find(c => c.name.toLowerCase() === cityName?.toLowerCase());
+
+  const { data: city, isLoading } = useQuery({
+    queryKey: ['city', cityName],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('cities')
+        .select('*')
+        .ilike('name', cityName || '')
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-12">
+        <div className="container mx-auto px-4">
+          <LoadingState />
+        </div>
+      </div>
+    );
+  }
 
   if (!city) {
     return (
@@ -50,6 +76,7 @@ const CityDetails = () => {
               <p className="text-gray-600">Grundsteuer B: {city.grundsteuerB}%</p>
             </div>
           </div>
+          <CityStats city={city} />
         </div>
       </div>
     </div>
