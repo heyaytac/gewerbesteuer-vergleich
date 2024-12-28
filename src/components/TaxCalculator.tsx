@@ -1,15 +1,35 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { cities } from "@/data/cities";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
+import { LoadingState } from "./LoadingState";
 
 const TaxCalculator = () => {
   const [revenue, setRevenue] = useState<string>("");
 
+  const { data: cities, isLoading } = useQuery({
+    queryKey: ['cities'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('cities')
+        .select('*')
+        .order('name');
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const calculateTax = () => {
     if (!revenue || isNaN(Number(revenue))) {
       toast.error("Bitte geben Sie einen gültigen Betrag ein");
+      return;
+    }
+
+    if (!cities || cities.length === 0) {
+      toast.error("Keine Städtedaten verfügbar");
       return;
     }
 
@@ -47,12 +67,17 @@ const TaxCalculator = () => {
         <p>Effektiver Steuersatz: {lowestTax.effectiveRate.toFixed(2)}%</p>
         <p>Gewerbesteuer: {lowestTax.tax.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</p>
         <p className="mt-2">Mögliche Ersparnis: {savings.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</p>
+        <p className="text-sm text-muted-foreground mt-2">Verglichen mit {cities.length} Städten</p>
       </div>,
       {
         duration: 8000
       }
     );
   };
+
+  if (isLoading) {
+    return <LoadingState />;
+  }
 
   return (
     <div className="mt-12 max-w-2xl mx-auto bg-card p-6 rounded-lg shadow-lg w-full">
