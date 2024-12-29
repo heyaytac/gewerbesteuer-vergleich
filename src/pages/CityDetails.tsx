@@ -64,7 +64,6 @@ const CityDetails = () => {
           </Button>
         </div>
         <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold mb-2">Gewerbesteuer in {city.name} 2024: Hebesätze & Wirtschaftsstandort</h1>
           <CityDescription city={city} />
           <CityStats city={city} />
         </div>
