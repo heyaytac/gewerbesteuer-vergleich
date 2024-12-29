@@ -18,7 +18,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/city/:cityName" element={<CityDetails />} />
+            <Route path="/stadt/:cityName" element={<CityDetails />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>

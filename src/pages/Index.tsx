@@ -173,7 +173,7 @@ const Index = () => {
               <HoverCard key={city.id}>
                 <HoverCardTrigger asChild>
                   <Link
-                    to={`/city/${city.name.toLowerCase()}`}
+                    to={`/stadt/${city.name.toLowerCase()}`}
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {city.name}
