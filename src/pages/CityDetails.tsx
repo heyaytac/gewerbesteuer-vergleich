@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { CityStats } from "@/components/CityStats";
 import { LoadingState } from "@/components/LoadingState";
+import { CityDescription } from "@/components/CityDescription";
 
 const CityDetails = () => {
   const { cityName } = useParams();
@@ -62,20 +63,9 @@ const CityDetails = () => {
             </Link>
           </Button>
         </div>
-        <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold mb-6">{city.name}</h1>
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-xl font-semibold mb-2">Standortinformationen</h2>
-              <p className="text-gray-600">Bundesland: {city.bundesland}</p>
-              <p className="text-gray-600">Einwohner: {city.einwohner.toLocaleString()}</p>
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold mb-2">Steuersätze</h2>
-              <p className="text-gray-600">Gewerbesteuer-Hebesatz: {city.hebesatz}%</p>
-              <p className="text-gray-600">Grundsteuer B: {city.grundsteuerB}%</p>
-            </div>
-          </div>
+        <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-8">
+          <h1 className="text-3xl font-bold mb-2">Gewerbesteuer in {city.name} 2024: Hebesätze & Wirtschaftsstandort</h1>
+          <CityDescription city={city} />
           <CityStats city={city} />
         </div>
       </div>
