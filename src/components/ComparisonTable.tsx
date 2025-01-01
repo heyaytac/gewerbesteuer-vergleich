@@ -1,5 +1,6 @@
 import { CityData } from "@/types/city";
 import { X } from "lucide-react";
+import ExportButton from "./ExportButton";
 
 interface ComparisonTableProps {
   cities: CityData[];
@@ -9,7 +10,10 @@ interface ComparisonTableProps {
 const ComparisonTable = ({ cities, onRemoveCity }: ComparisonTableProps) => {
   return (
     <div className="mt-8 bg-white rounded-lg shadow-lg p-6">
-      <h2 className="text-xl font-semibold mb-4">Städtevergleich</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Städtevergleich</h2>
+        {cities.length >= 2 && <ExportButton cities={cities} />}
+      </div>
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
