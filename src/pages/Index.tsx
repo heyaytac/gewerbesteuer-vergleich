@@ -12,6 +12,7 @@ import { useToast } from "@/components/ui/use-toast";
 import Header from "@/components/Header";
 import SearchSection from "@/components/SearchSection";
 import FeaturesSection from "@/components/FeaturesSection";
+import ContactForm from "@/components/ContactForm";
 import CityFooter from "@/components/CityFooter";
 import { CityStats } from "@/components/CityStats";
 
@@ -113,6 +114,7 @@ const Index = () => {
 
         <TaxCalculator />
         <FeaturesSection />
+        <ContactForm />
         <CityFooter cities={allCities} />
       </div>
     </div>
