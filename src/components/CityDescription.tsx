@@ -1,4 +1,5 @@
 import { CityData } from "@/types/city";
+import { CityMetrics } from "./CityMetrics";
 
 interface CityDescriptionProps {
   city: CityData;
@@ -8,7 +9,6 @@ export const CityDescription = ({ city }: CityDescriptionProps) => {
   const getCityDescription = (city: CityData) => {
     const effectiveRate = ((city.hebesatz / 100) * 0.035 * 100).toFixed(1);
     
-    // Generate a detailed description for each city based on its characteristics
     return (
       <>
         <h1 className="text-3xl font-bold mb-4">
@@ -26,7 +26,10 @@ export const CityDescription = ({ city }: CityDescriptionProps) => {
             <li>Grundsteuer B: {city.grundsteuerB}%</li>
           )}
         </ul>
-        <div className="prose max-w-none">
+
+        <CityMetrics city={city} />
+
+        <div className="prose max-w-none mt-8">
           <h2 className="text-xl font-semibold mb-3">Wirtschaftliche Bedeutung</h2>
           <p className="mb-4">
             Mit {city.einwohner.toLocaleString()} Einwohnern zählt {city.name} zu den bedeutenden Wirtschaftsstandorten {city.bundesland === "Nordrhein-Westfalen" ? "in" : "im"} {city.bundesland}. 
