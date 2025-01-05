@@ -17,7 +17,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/city/:cityId" element={<CityDetails />} />
-            <Route path="/blog/gewerbesteuerrechner" element={<BlogPost />} />
+            <Route path="/blog/gewerbesteuerrechner-leitfaden" element={<BlogPost />} />
             <Route path="/blog/gewerbesteuer-2024" element={<BlogPost2024 />} />
           </Routes>
         </Router>
