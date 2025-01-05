@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes";
 import { Analytics } from "@vercel/analytics/react";
 import Index from "./pages/Index";
 import CityDetails from "./pages/CityDetails";
+import BlogPost from "./pages/BlogPost";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/stadt/:cityName" element={<CityDetails />} />
+            <Route path="/blog/gewerbesteuerrechner-leitfaden" element={<BlogPost />} />
           </Routes>
         </BrowserRouter>
         <Analytics />
