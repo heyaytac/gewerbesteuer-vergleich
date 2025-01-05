@@ -15,6 +15,9 @@ import FeaturesSection from "@/components/FeaturesSection";
 import ContactForm from "@/components/ContactForm";
 import CityFooter from "@/components/CityFooter";
 import { CityStats } from "@/components/CityStats";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -113,6 +116,28 @@ const Index = () => {
         )}
 
         <TaxCalculator />
+
+        {/* Blog Section */}
+        <section className="mt-24 max-w-4xl mx-auto">
+          <h2 className="text-2xl font-semibold mb-8 text-center">Aktuelle Artikel</h2>
+          <div className="bg-card rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow">
+            <h3 className="text-xl font-semibold mb-4">
+              Der ultimative Leitfaden zum Gewerbesteuerrechner
+            </h3>
+            <p className="text-muted-foreground mb-6">
+              Die Berechnung der Gewerbesteuer stellt viele Unternehmer vor große Herausforderungen. 
+              Ein Gewerbesteuerrechner kann dabei eine unverzichtbare Hilfe sein. In diesem Artikel 
+              erfahren Sie alles Wichtige über dieses nützliche Tool.
+            </p>
+            <Link to="/blog/gewerbesteuerrechner-leitfaden">
+              <Button variant="outline" className="group">
+                Weiterlesen
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+          </div>
+        </section>
+
         <FeaturesSection />
         <ContactForm />
         <CityFooter cities={allCities} />
