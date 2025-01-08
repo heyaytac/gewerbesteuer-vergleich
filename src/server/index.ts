@@ -28,6 +28,20 @@ app.get('/api/cities/search', async (req, res) => {
   }
 });
 
+app.get('/api/cities/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await query('SELECT * FROM cities WHERE id = $1', [id]);
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'City not found' });
+    } else {
+      res.json(result.rows[0]);
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch city' });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

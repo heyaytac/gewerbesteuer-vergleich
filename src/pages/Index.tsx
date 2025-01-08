@@ -3,7 +3,7 @@ import { CityData } from "@/types/city";
 import ComparisonTable from "@/components/ComparisonTable";
 import TaxCalculator from "@/components/TaxCalculator";
 import { useQuery } from "@tanstack/react-query";
-import { searchCities, fetchCities } from "@/lib/supabase";
+import { fetchCities } from "@/lib/api";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LoadingState } from "@/components/LoadingState";
 import { TaxRateChart } from "@/components/TaxRateChart";
@@ -36,13 +36,13 @@ const Index = () => {
 
   const { toast } = useToast();
 
-  const { data: results = [], isLoading: isSearchLoading } = useQuery({
+  const { data: results = [], isLoading: isSearchLoading } = useQuery<CityData[]>({
     queryKey: ['cities', searchTerm, filters],
-    queryFn: () => searchCities(searchTerm),
+    queryFn: () => searchTerm.length > 2 ? fetchCities() : Promise.resolve([]),
     enabled: searchTerm.length > 2,
   });
 
-  const { data: allCities = [], isLoading: isAllCitiesLoading } = useQuery({
+  const { data: allCities = [], isLoading: isAllCitiesLoading } = useQuery<CityData[]>({
     queryKey: ['allCities'],
     queryFn: fetchCities,
   });
