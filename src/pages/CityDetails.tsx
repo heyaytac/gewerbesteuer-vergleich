@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase";
+import { query } from "@/lib/db";
 import { CityStats } from "@/components/CityStats";
 import { LoadingState } from "@/components/LoadingState";
 import { CityDescription } from "@/components/CityDescription";
@@ -13,14 +13,11 @@ const CityDetails = () => {
   const { data: city, isLoading } = useQuery({
     queryKey: ['city', cityName],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('cities')
-        .select('*')
-        .ilike('name', cityName || '')
-        .single();
-
-      if (error) throw error;
-      return data;
+      const result = await query(
+        'SELECT * FROM cities WHERE LOWER(name) = LOWER($1) LIMIT 1',
+        [cityName || '']
+      );
+      return result.rows[0];
     },
   });
 
