@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
-import { fetchCities } from "@/lib/supabase";
+import { fetchCities } from "@/lib/api";
 import { LoadingState } from "./LoadingState";
 
 const TaxCalculator = () => {

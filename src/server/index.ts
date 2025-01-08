@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { query } from '../lib/db';
+import { query } from './db';
 
 const app = express();
 app.use(cors());
